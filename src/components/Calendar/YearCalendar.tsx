@@ -204,14 +204,14 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDay
           let ring = '';
 
           if (isWork && isHoliday) {
-            bg = 'bg-white rounded-full';
+            bg = 'bg-white';
             text = 'text-black font-semibold';
-            ring = 'ring-1 ring-[#fbbf24]';
+            ring = 'ring-1 ring-[#fbbf24] ring-offset-1 ring-offset-[#18181b]';
           } else if (isWork) {
-            bg = 'bg-white rounded-full';
+            bg = 'bg-white';
             text = 'text-black font-semibold';
           } else if (isHoliday) {
-            bg = 'bg-[#78350f]/40 rounded-full';
+            bg = 'bg-[#78350f]/40';
             text = 'text-[#fbbf24]';
           } else if (isWeekend) {
             text = 'text-[#3f3f46]';
@@ -220,19 +220,21 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDay
           }
 
           if (isToday && !isWork) {
-            ring = 'ring-1 ring-white rounded-full';
+            ring = 'ring-1 ring-white';
           }
 
           return (
             <div
               key={s}
-              className={`aspect-square flex items-center justify-center cursor-default ${bg} ${ring}`}
+              className="aspect-square flex items-center justify-center"
               onMouseEnter={(e) => onDayEnter(e, s, d)}
               onMouseLeave={onDayLeave}
             >
-              <span className={`text-[9px] leading-none sm:text-[10px] ${text}`}>
-                {d.getDate()}
-              </span>
+              <div className={`flex h-[17px] w-[17px] items-center justify-center rounded-full ${bg} ${ring}`}>
+                <span className={`text-[9px] leading-none ${text}`}>
+                  {d.getDate()}
+                </span>
+              </div>
             </div>
           );
         })}

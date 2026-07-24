@@ -40,6 +40,12 @@ body {
   flex-direction: column;
 }
 
+button,
+a,
+[role="button"] {
+  cursor: pointer;
+}
+
 ::-webkit-scrollbar {
   width: 4px;
 }
