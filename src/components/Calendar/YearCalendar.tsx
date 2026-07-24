@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
@@ -7,6 +7,8 @@ const MONTH_NAMES = [
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
 ];
+
+const DAY_NAMES = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -27,6 +29,24 @@ function leadingBlanks(year: number, month: number): number {
   return (dow + 6) % 7; // Mon=0 … Sun=6
 }
 
+function fmtTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtMinutes(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m > 0 ? `${h}:${String(m).padStart(2, '0')} h` : `${h} h`;
+}
+
+interface TooltipData {
+  entry: WorkEntry | null;
+  holiday: string | null;
+  date: Date;
+  x: number;
+  y: number;
+}
+
 interface YearCalendarProps {
   entries: WorkEntry[];
 }
@@ -34,6 +54,8 @@ interface YearCalendarProps {
 export function YearCalendar({ entries }: YearCalendarProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const today = localDateStr(new Date());
+  const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const workDays = useMemo(() => {
     const s = new Set<string>();
@@ -43,12 +65,40 @@ export function YearCalendar({ entries }: YearCalendarProps) {
     return s;
   }, [entries]);
 
+  const entryMap = useMemo(() => {
+    const m = new Map<string, WorkEntry>();
+    for (const e of entries) m.set(e.date, e);
+    return m;
+  }, [entries]);
+
   const activeDate = useMemo(
     () => entries.find((e) => e.clock_out === null)?.date,
     [entries]
   );
 
   const holidayMap = useMemo(() => getHolidayMap([year]), [year]);
+
+  const handleDayEnter = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, dateStr: string, date: Date) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      const rect = e.currentTarget.getBoundingClientRect();
+      timerRef.current = setTimeout(() => {
+        setTooltip({
+          entry: entryMap.get(dateStr) ?? null,
+          holiday: holidayMap.get(dateStr) ?? null,
+          date,
+          x: rect.left + rect.width / 2,
+          y: rect.top,
+        });
+      }, 1000);
+    },
+    [entryMap, holidayMap]
+  );
+
+  const handleDayLeave = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setTooltip(null);
+  }, []);
 
   return (
     <div className="rounded-2xl border border-[#27272a] bg-[#18181b] p-4 sm:p-5">
@@ -87,9 +137,13 @@ export function YearCalendar({ entries }: YearCalendarProps) {
             activeDate={activeDate}
             holidayMap={holidayMap}
             today={today}
+            onDayEnter={handleDayEnter}
+            onDayLeave={handleDayLeave}
           />
         ))}
       </div>
+
+      {tooltip && <DayTooltip data={tooltip} />}
     </div>
   );
 }
@@ -110,11 +164,13 @@ interface MonthGridProps {
   activeDate?: string;
   holidayMap: Map<string, string>;
   today: string;
+  onDayEnter: (e: React.MouseEvent<HTMLDivElement>, dateStr: string, date: Date) => void;
+  onDayLeave: () => void;
 }
 
 const DOW_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
-function MonthGrid({ year, month, workDays, activeDate, holidayMap, today }: MonthGridProps) {
+function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDayEnter, onDayLeave }: MonthGridProps) {
   const days = getDaysInMonth(year, month);
   const blanks = leadingBlanks(year, month);
 
@@ -170,8 +226,9 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today }: Mon
           return (
             <div
               key={s}
-              title={isHoliday ? (holidayMap.get(s) ?? undefined) : undefined}
-              className={`aspect-square flex items-center justify-center ${bg} ${ring}`}
+              className={`aspect-square flex items-center justify-center cursor-default ${bg} ${ring}`}
+              onMouseEnter={(e) => onDayEnter(e, s, d)}
+              onMouseLeave={onDayLeave}
             >
               <span className={`text-[9px] leading-none sm:text-[10px] ${text}`}>
                 {d.getDate()}
@@ -180,6 +237,52 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today }: Mon
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function DayTooltip({ data }: { data: TooltipData }) {
+  const { entry, holiday, date, x, y } = data;
+  const dateLabel = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const dayName = DAY_NAMES[date.getDay()];
+
+  return (
+    <div
+      className="pointer-events-none fixed z-50 min-w-45 rounded-xl border border-border-hover bg-bg-primary p-3 shadow-2xl"
+      style={{ top: y - 10, left: x, transform: 'translate(-50%, -100%)' }}
+    >
+      <p className="mb-2 text-xs font-semibold text-white">
+        {dayName}, {dateLabel}
+      </p>
+
+      {holiday && (
+        <p className="mb-1.5 text-[11px] text-amber">{holiday}</p>
+      )}
+
+      {entry ? (
+        entry.clock_out ? (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between gap-6 text-[11px]">
+              <span className="text-[#71717a]">Ein</span>
+              <span className="text-white">{fmtTime(entry.clock_in)}</span>
+            </div>
+            <div className="flex items-center justify-between gap-6 text-[11px]">
+              <span className="text-[#71717a]">Aus</span>
+              <span className="text-white">{fmtTime(entry.clock_out)}</span>
+            </div>
+            {entry.effective_minutes !== null && (
+              <div className="flex items-center justify-between gap-6 border-t border-[#27272a] pt-1.5 text-[11px]">
+                <span className="text-[#71717a]">Effektiv</span>
+                <span className="font-semibold text-white">{fmtMinutes(entry.effective_minutes)}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-[11px] text-[#22c55e]">Aktiv seit {fmtTime(entry.clock_in)}</p>
+        )
+      ) : (
+        <p className="text-[11px] text-text-muted">Kein Eintrag</p>
+      )}
     </div>
   );
 }
