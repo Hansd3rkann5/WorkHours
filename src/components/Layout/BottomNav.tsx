@@ -9,7 +9,7 @@ export function BottomNav() {
           to="/"
           end
           className={({ isActive }) =>
-            `flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors ${
+            `flex flex-1 cursor-pointer flex-col items-center gap-1 py-3 text-xs transition-colors ${
               isActive ? 'text-white' : 'text-[#52525b] hover:text-[#a1a1aa]'
             }`
           }
@@ -24,7 +24,7 @@ export function BottomNav() {
         <NavLink
           to="/verlauf"
           className={({ isActive }) =>
-            `flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors ${
+            `flex flex-1 cursor-pointer flex-col items-center gap-1 py-3 text-xs transition-colors ${
               isActive ? 'text-white' : 'text-[#52525b] hover:text-[#a1a1aa]'
             }`
           }

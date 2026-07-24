@@ -41,7 +41,7 @@ export function ExportMenu({ entries }: ExportMenuProps) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-xl border border-[#27272a] bg-[#18181b] px-4 py-2.5 text-sm text-[#f4f4f5] transition-colors hover:border-[#3f3f46] hover:bg-[#27272a]"
+        className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#27272a] bg-[#18181b] px-4 py-2.5 text-sm text-[#f4f4f5] transition-colors hover:border-[#3f3f46] hover:bg-[#27272a]"
       >
         <Download size={16} />
         Exportieren
@@ -55,7 +55,7 @@ export function ExportMenu({ entries }: ExportMenuProps) {
                 item.action();
                 setOpen(false);
               }}
-              className="flex w-full items-center gap-3 px-4 py-3 text-sm text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
+              className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
             >
               {item.icon}
               {item.label}

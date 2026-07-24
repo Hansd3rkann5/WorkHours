@@ -106,14 +106,14 @@ export function YearCalendar({ entries }: YearCalendarProps) {
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => setYear((y) => y - 1)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
         >
           <ChevronLeft size={16} />
         </button>
         <span className="text-sm font-semibold text-white">{year}</span>
         <button
           onClick={() => setYear((y) => y + 1)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#a1a1aa] transition-colors hover:bg-[#27272a] hover:text-white"
         >
           <ChevronRight size={16} />
         </button>

@@ -65,7 +65,7 @@ export function ClockButton({ activeEntry, onClockIn, onClockOut }: ClockButtonP
         disabled={busy}
         aria-label={isWorking ? 'Ausstempeln' : 'Einstempeln'}
         className={`
-          relative flex h-28 w-28 items-center justify-center rounded-full border-2 transition-all duration-200
+          relative flex h-28 w-28 cursor-pointer items-center justify-center rounded-full border-2 transition-all duration-200
           active:scale-95 disabled:opacity-50
           ${
             isWorking

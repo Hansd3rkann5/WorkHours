@@ -114,14 +114,14 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
               <button
                 onClick={handleSave}
                 disabled={busy}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4ade80] hover:bg-[#166534]/20"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#4ade80] hover:bg-[#166534]/20"
               >
                 <Check size={15} />
               </button>
               <button
                 onClick={() => setEditing(false)}
                 disabled={busy}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#a1a1aa] hover:bg-[#27272a]"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#a1a1aa] hover:bg-[#27272a]"
               >
                 <X size={15} />
               </button>
@@ -130,14 +130,14 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
             <>
               <button
                 onClick={() => setEditing(true)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#27272a] hover:text-[#a1a1aa]"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#27272a] hover:text-[#a1a1aa]"
               >
                 <Edit2 size={14} />
               </button>
               <button
                 onClick={handleDelete}
                 disabled={busy}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#7f1d1d]/20 hover:text-[#f87171]"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#7f1d1d]/20 hover:text-[#f87171]"
               >
                 <Trash2 size={14} />
               </button>
