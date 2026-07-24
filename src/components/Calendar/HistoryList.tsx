@@ -17,6 +17,18 @@ function groupByMonth(entries: WorkEntry[]): Record<string, WorkEntry[]> {
   return groups;
 }
 
+/** Groups already date-sorted entries into contiguous day buckets (earliest clock_in first within a day). */
+function groupByDay(entries: WorkEntry[]): { date: string; items: WorkEntry[] }[] {
+  const groups: { date: string; items: WorkEntry[] }[] = [];
+  for (const e of entries) {
+    const last = groups[groups.length - 1];
+    if (last && last.date === e.date) last.items.push(e);
+    else groups.push({ date: e.date, items: [e] });
+  }
+  for (const g of groups) g.items.sort((a, b) => a.clock_in.localeCompare(b.clock_in));
+  return groups;
+}
+
 function weekSums(entries: WorkEntry[]): Record<string, number> {
   const sums: Record<string, number> = {};
   for (const e of entries) {
@@ -85,16 +97,15 @@ export function HistoryList() {
                 <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#52525b]">
                   {monthLabel(monthKey)}
                 </h2>
-                <div className="flex flex-col gap-2">
-                  {monthEntries.map((entry) => {
-                    const wk = getISOWeekKey(entry.date);
+                <div className="flex flex-col gap-3">
+                  {groupByDay(monthEntries).map(({ date, items }, dayIdx, dayArr) => {
+                    const wk = getISOWeekKey(date);
                     const weekTotal = sums[wk] ?? 0;
                     const isFirstOfWeek =
-                      monthEntries.findIndex((e) => getISOWeekKey(e.date) === wk) ===
-                      monthEntries.indexOf(entry);
+                      dayArr.findIndex((g) => getISOWeekKey(g.date) === wk) === dayIdx;
 
                     return (
-                      <div key={entry.id}>
+                      <div key={date}>
                         {isFirstOfWeek && (
                           <div className="mb-2 mt-1 flex items-center justify-between">
                             <span className="text-xs text-[#3f3f46]">
@@ -109,13 +120,18 @@ export function HistoryList() {
                             </span>
                           </div>
                         )}
-                        <p className="mb-1 text-xs text-[#52525b]">{dayLabel(entry.date)}</p>
-                        <WorkDayCard
-                          entry={entry}
-                          holidayName={holidayMap.get(entry.date)}
-                          onDelete={deleteEntry}
-                          onUpdate={updateEntry}
-                        />
+                        <p className="mb-1 text-xs text-[#52525b]">{dayLabel(date)}</p>
+                        <div className="flex flex-col gap-2">
+                          {items.map((entry) => (
+                            <WorkDayCard
+                              key={entry.id}
+                              entry={entry}
+                              holidayName={holidayMap.get(date)}
+                              onDelete={deleteEntry}
+                              onUpdate={updateEntry}
+                            />
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
