@@ -51,12 +51,12 @@ export function ClockButton({ activeEntry, onClockIn, onClockOut }: ClockButtonP
         >
           {minutesToDisplay(isWorking ? effective : 0)}
         </div>
-        {isWorking && elapsed >= 360 && (
+        {/* {isWorking && elapsed >= 360 && (
           <p className="mt-1 text-xs text-[#a1a1aa]">inkl. 30 min Pause abgezogen</p>
         )}
         {!isWorking && (
           <p className="mt-1 text-sm text-[#52525b]">Heute noch nicht eingestempelt</p>
-        )}
+        )} */}
       </div>
 
       {/* Clock button */}
