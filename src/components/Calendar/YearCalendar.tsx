@@ -8,11 +8,15 @@ const MONTH_NAMES = [
   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
 ];
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function getDaysInMonth(year: number, month: number): { d: Date; s: string }[] {
   const result = [];
   const cur = new Date(year, month, 1);
   while (cur.getMonth() === month) {
-    result.push({ d: new Date(cur), s: cur.toISOString().slice(0, 10) });
+    result.push({ d: new Date(cur), s: localDateStr(cur) });
     cur.setDate(cur.getDate() + 1);
   }
   return result;
@@ -29,7 +33,7 @@ interface YearCalendarProps {
 
 export function YearCalendar({ entries }: YearCalendarProps) {
   const [year, setYear] = useState(new Date().getFullYear());
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr(new Date());
 
   const workDays = useMemo(() => {
     const s = new Set<string>();

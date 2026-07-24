@@ -39,13 +39,13 @@ function AppShell() {
       {/* ── Desktop layout (≥1280px): 3 columns, no bottom nav ── */}
       <div className="hidden xl:flex flex-1 min-h-0 divide-x divide-[#27272a]">
         {/* Left — Dashboard */}
-        <div className="flex w-[360px] shrink-0 flex-col overflow-y-auto">
+        <div className="flex w-[360px] shrink-0 flex-col overflow-y-hidden">
           <ColumnLabel label="Dashboard" />
           <DashboardContent />
         </div>
 
         {/* Center — Year calendar */}
-        <div className="flex flex-1 flex-col overflow-y-auto">
+        <div className="flex flex-1 flex-col overflow-y-hidden">
           <ColumnLabel label="Jahresübersicht" />
           <div className="p-5">
             <YearCalendar entries={entries} />
