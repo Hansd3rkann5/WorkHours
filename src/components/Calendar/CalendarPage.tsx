@@ -3,6 +3,7 @@ import { Loader2, WifiOff, CalendarX } from 'lucide-react';
 import { useWorkEntriesContext as useWorkEntries } from '../../hooks/WorkEntriesContext';
 import { WorkDayCard } from './WorkDayCard';
 import { ExportMenu } from './ExportMenu';
+import { YearCalendar } from './YearCalendar';
 import { getHolidayMap } from '../../utils/holidays';
 import { getISOWeekKey, minutesToDisplay } from '../../utils/timeCalc';
 import type { WorkEntry } from '../../types';
@@ -77,15 +78,6 @@ export function CalendarPage() {
     );
   }
 
-  if (entries.length === 0) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <CalendarX size={40} className="text-[#27272a]" />
-        <p className="text-sm text-[#52525b]">Noch keine Einträge</p>
-      </div>
-    );
-  }
-
   const monthKeys = Object.keys(byMonth).sort((a, b) => b.localeCompare(a));
 
   return (
@@ -101,7 +93,19 @@ export function CalendarPage() {
       </div>
 
       <div className="flex flex-col gap-6 px-4 pt-6">
-        {monthKeys.map((monthKey) => {
+        {/* Year calendar */}
+        <YearCalendar entries={entries} />
+
+        {/* Entry list or empty state */}
+        {entries.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+            <CalendarX size={40} className="text-[#27272a]" />
+            <p className="text-sm text-[#52525b]">Noch keine Einträge</p>
+          </div>
+        ) : (
+          <>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#52525b]">Verlauf</p>
+            {monthKeys.map((monthKey) => {
           const monthEntries = byMonth[monthKey];
           return (
             <section key={monthKey}>
@@ -154,6 +158,8 @@ export function CalendarPage() {
             </section>
           );
         })}
+          </>
+        )}
       </div>
     </main>
   );
