@@ -15,6 +15,7 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
   const [clockInVal, setClockInVal] = useState(formatTime(entry.clock_in));
   const [clockOutVal, setClockOutVal] = useState(entry.clock_out ? formatTime(entry.clock_out) : '');
   const [busy, setBusy] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const handleSave = async () => {
     setBusy(true);
@@ -33,11 +34,13 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
 
   const handleDelete = async () => {
     if (!confirm('Eintrag löschen?')) return;
-    setBusy(true);
+    // Play the collapse/fade animation first, then remove from state.
+    setRemoving(true);
+    await new Promise((r) => setTimeout(r, 320));
     try {
       await onDelete(entry.id);
-    } finally {
-      setBusy(false);
+    } catch {
+      setRemoving(false); // restore the card if the request failed
     }
   };
 
@@ -45,10 +48,14 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
 
   return (
     <div
-      className={`rounded-2xl border p-4 transition-colors ${
+      className={`overflow-hidden rounded-2xl border p-4 transition-all duration-300 ease-out ${
         holidayName
           ? 'border-[#78350f] bg-[#78350f]/10'
           : 'border-[#27272a] bg-[#18181b]'
+      } ${
+        removing
+          ? 'max-h-0 -translate-x-4 scale-95 border-transparent! p-0! opacity-0'
+          : 'max-h-40'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -136,7 +143,7 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
               </button>
               <button
                 onClick={handleDelete}
-                disabled={busy}
+                disabled={busy || removing}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#7f1d1d]/20 hover:text-[#f87171]"
               >
                 <Trash2 size={14} />
