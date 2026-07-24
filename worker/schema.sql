@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS work_entries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  clock_in TEXT NOT NULL,
+  clock_out TEXT,
+  clocked_minutes INTEGER,
+  effective_minutes INTEGER,
+  created_at TEXT DEFAULT (datetime('now'))
+);
