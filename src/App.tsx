@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Header } from './components/Layout/Header';
 import { BottomNav } from './components/Layout/BottomNav';
@@ -77,10 +77,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/WorkHours">
+    <HashRouter>
       <WorkEntriesProvider>
         <AppShell />
       </WorkEntriesProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
