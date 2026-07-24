@@ -33,7 +33,7 @@ function AppShell() {
   const { activeEntry, entries } = useWorkEntriesContext();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#09090b]">
+    <div className="flex min-h-dvh flex-col bg-[#09090b] xl:h-dvh xl:overflow-hidden">
       <Header activeEntry={!!activeEntry} />
 
       {/* ── Desktop layout (≥1280px): 3 columns, no bottom nav ── */}
