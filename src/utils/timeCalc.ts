@@ -4,7 +4,7 @@ const PAUSE_THRESHOLD_MINUTES = 360; // 6h
 const PAUSE_MINUTES = 30;
 
 export function calcEffectiveMinutes(clockedMinutes: number): number {
-  if (clockedMinutes >= PAUSE_THRESHOLD_MINUTES) {
+  if (clockedMinutes > PAUSE_THRESHOLD_MINUTES) {
     return clockedMinutes - PAUSE_MINUTES;
   }
   return clockedMinutes;
@@ -49,7 +49,7 @@ export function currentWeekKey(): string {
  * Calculates balance across all completed (past) weeks that have at least one entry.
  * Current week is excluded from balance and shown separately.
  */
-export function calcBalance(entries: WorkEntry[]): {
+export function calcBalance(entries: WorkEntry[], balanceOffsetMinutes = 0): {
   balanceMinutes: number;
   thisWeekMinutes: number;
   weeksWithEntries: number;
@@ -77,7 +77,7 @@ export function calcBalance(entries: WorkEntry[]): {
   const thisWeekMinutes = weekMap[thisWeek] ?? 0;
   const totalEffectiveMinutes = Object.values(weekMap).reduce((a, b) => a + b, 0);
 
-  return { balanceMinutes, thisWeekMinutes, weeksWithEntries, totalEffectiveMinutes };
+  return { balanceMinutes: balanceMinutes + balanceOffsetMinutes, thisWeekMinutes, weeksWithEntries, totalEffectiveMinutes };
 }
 
 export function formatTime(isoStr: string): string {

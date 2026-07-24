@@ -7,3 +7,8 @@ CREATE TABLE IF NOT EXISTS work_entries (
   effective_minutes INTEGER,
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);

@@ -16,7 +16,7 @@ const PAUSE_THRESHOLD = 360; // 6h in minutes
 const PAUSE_DEDUCTION = 30;
 
 function calcEffective(clocked: number): number {
-  return clocked >= PAUSE_THRESHOLD ? clocked - PAUSE_DEDUCTION : clocked;
+  return clocked > PAUSE_THRESHOLD ? clocked - PAUSE_DEDUCTION : clocked;
 }
 
 function cors(origin: string) {
@@ -47,6 +47,14 @@ export default {
     // CORS preflight
     if (method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: cors(origin) });
+    }
+
+    // GET /api/settings
+    if (method === 'GET' && pathname === '/api/settings') {
+      const row = await env.DB.prepare(
+        "SELECT value FROM settings WHERE key = 'balance_offset_minutes'"
+      ).first<{ value: string }>();
+      return json({ balance_offset_minutes: row ? Number(row.value) : 0 }, 200, origin);
     }
 
     // GET /api/entries

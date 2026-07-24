@@ -17,6 +17,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   getEntries: (): Promise<WorkEntry[]> => request('/api/entries'),
 
+  getSettings: (): Promise<{ balance_offset_minutes: number }> =>
+    request('/api/settings'),
+
   clockIn: (): Promise<WorkEntry> =>
     request('/api/entries', {
       method: 'POST',

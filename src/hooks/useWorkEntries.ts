@@ -5,14 +5,19 @@ import { calcBalance, todayStr } from '../utils/timeCalc';
 
 export function useWorkEntries() {
   const [entries, setEntries] = useState<WorkEntry[]>([]);
+  const [balanceOffset, setBalanceOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       setError(null);
-      const data = await api.getEntries();
+      const [data, settings] = await Promise.all([
+        api.getEntries(),
+        api.getSettings(),
+      ]);
       setEntries(data);
+      setBalanceOffset(settings.balance_offset_minutes);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fehler beim Laden');
     } finally {
@@ -51,7 +56,7 @@ export function useWorkEntries() {
     return updated;
   };
 
-  const balance = calcBalance(entries);
+  const balance = calcBalance(entries, balanceOffset);
 
   return {
     entries,
