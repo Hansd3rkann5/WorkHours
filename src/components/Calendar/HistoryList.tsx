@@ -52,6 +52,13 @@ function dayLabel(dateStr: string): string {
   return d.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
+/** Colour for a weekly total: ≤6h red, 6–12h amber, ≥12h green. */
+function weekTotalColor(min: number): string {
+  if (min <= 360) return 'text-[#f87171]';
+  if (min < 720) return 'text-[#fbbf24]';
+  return 'text-[#4ade80]';
+}
+
 export function HistoryList() {
   const { entries, deleteEntry, updateEntry } = useWorkEntriesContext();
 
@@ -111,11 +118,7 @@ export function HistoryList() {
                             <span className="text-xs text-[#3f3f46]">
                               KW {wk.split('-W')[1]}
                             </span>
-                            <span
-                              className={`text-xs font-medium ${
-                                weekTotal >= 720 ? 'text-[#4ade80]' : 'text-[#a1a1aa]'
-                              }`}
-                            >
+                            <span className={`text-xs font-medium ${weekTotalColor(weekTotal)}`}>
                               {minutesToDisplay(weekTotal)} / 12:00
                             </span>
                           </div>
