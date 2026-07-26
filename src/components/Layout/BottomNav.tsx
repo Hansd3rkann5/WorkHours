@@ -3,7 +3,10 @@ import { NavLink } from 'react-router-dom';
 
 export function BottomNav() {
   return (
-    <nav className="sticky bottom-0 z-10 border-t border-[#27272a] bg-[#09090b]/95 backdrop-blur-sm">
+    <nav
+      className="shrink-0 border-t border-[#27272a] bg-[#09090b]/95 backdrop-blur-sm xl:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="mx-auto flex max-w-2xl">
         <NavLink
           to="/"

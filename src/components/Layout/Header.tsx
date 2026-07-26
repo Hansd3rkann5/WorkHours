@@ -6,7 +6,10 @@ interface HeaderProps {
 
 export function Header({ activeEntry }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-[#27272a] bg-[#09090b]/90 backdrop-blur-sm">
+    <header
+      className="shrink-0 border-b border-[#27272a] bg-[#09090b]/90 backdrop-blur-sm"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="gap-2 mx-auto flex max-w-2xl items-center justify-center px-4 py-4">
         <div className="flex items-center gap-2">
           <Clock size={20} className="text-white" />

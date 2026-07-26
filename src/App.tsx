@@ -33,7 +33,7 @@ function AppShell() {
   const { activeEntry, entries } = useWorkEntriesContext();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#09090b] xl:h-dvh xl:overflow-hidden">
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#09090b]">
       <Header activeEntry={!!activeEntry} />
 
       {/* ── Desktop layout (≥1280px): 3 columns, no bottom nav ── */}
@@ -59,8 +59,8 @@ function AppShell() {
         </div>
       </div>
 
-      {/* ── Mobile layout (<1280px): tabs + bottom nav ── */}
-      <div className="flex flex-1 flex-col overflow-y-auto xl:hidden">
+      {/* ── Mobile layout (<1280px): scrollable content + fixed bottom nav ── */}
+      <div className="flex flex-1 flex-col overflow-y-auto overscroll-y-contain xl:hidden">
         <Suspense fallback={SPINNER}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -68,9 +68,7 @@ function AppShell() {
           </Routes>
         </Suspense>
       </div>
-      <div className="xl:hidden">
-        <BottomNav />
-      </div>
+      <BottomNav />
     </div>
   );
 }

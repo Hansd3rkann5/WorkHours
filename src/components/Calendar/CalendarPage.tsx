@@ -1,6 +1,6 @@
 import { Loader2, WifiOff } from 'lucide-react';
 import { useWorkEntriesContext } from '../../hooks/WorkEntriesContext';
-import { YearCalendar } from './YearCalendar';
+import { MonthCalendar } from './MonthCalendar';
 import { HistoryList } from './HistoryList';
 
 export function CalendarPage() {
@@ -25,7 +25,7 @@ export function CalendarPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-6 pb-8">
-      <YearCalendar entries={entries} />
+      <MonthCalendar entries={entries} />
       <HistoryList />
     </main>
   );
