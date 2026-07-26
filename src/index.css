@@ -58,6 +58,35 @@ a,
   cursor: pointer;
 }
 
+/* Calendar transitions — gentle ease-in-out reveals for content that changes. */
+@keyframes dayDetailIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-day-detail {
+  animation: dayDetailIn 0.25s ease-in-out;
+}
+
+@keyframes monthIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-month {
+  animation: monthIn 0.25s ease-in-out;
+}
+
 ::-webkit-scrollbar {
   width: 4px;
 }

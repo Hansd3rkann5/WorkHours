@@ -180,7 +180,7 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDay
               onMouseEnter={(e) => onDayEnter(e, s, d)}
               onMouseLeave={onDayLeave}
             >
-              <div className={`flex h-[17px] w-[17px] items-center justify-center rounded-full ${bg} ${ring}`}>
+              <div className={`flex h-[17px] w-[17px] items-center justify-center rounded-sm transition-all duration-200 ease-in-out ${bg} ${ring}`}>
                 <span className={`text-[9px] leading-none ${text}`}>
                   {d.getDate()}
                 </span>

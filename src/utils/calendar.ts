@@ -71,6 +71,7 @@ export function getDayStyle(opts: {
   }
 
   if (isToday && !isWork) {
+    text = 'text-white';
     ring = 'ring-1 ring-white';
   }
 

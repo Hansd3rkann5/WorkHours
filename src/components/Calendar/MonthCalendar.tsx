@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
@@ -27,6 +27,9 @@ export function MonthCalendar({ entries }: MonthCalendarProps) {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState<string | null>(null);
+  // Remember the last opened day so its details stay rendered while the panel collapses.
+  const lastSelected = useRef<string | null>(null);
+  if (selected) lastSelected.current = selected;
   const today = localDateStr(now);
 
   const workDays = useMemo(() => {
@@ -66,6 +69,8 @@ export function MonthCalendar({ entries }: MonthCalendarProps) {
       setMonth((m) => m + 1);
     }
   };
+
+  const detailDay = selected ?? lastSelected.current;
 
   return (
     <div className="rounded-2xl border border-[#27272a] bg-[#18181b] p-4">
@@ -107,7 +112,7 @@ export function MonthCalendar({ entries }: MonthCalendarProps) {
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7 gap-1">
+      <div key={`${year}-${month}`} className="animate-month grid grid-cols-7 gap-1">
         {Array.from({ length: blanks }, (_, i) => (
           <div key={`bl${i}`} className="aspect-square" />
         ))}
@@ -124,24 +129,38 @@ export function MonthCalendar({ entries }: MonthCalendarProps) {
             <button
               key={s}
               onClick={() => setSelected((cur) => (cur === s ? null : s))}
-              className={`flex aspect-square items-center justify-center rounded-xl transition-colors ${bg} ${
-                isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#18181b]' : ring
-              }`}
+              className="flex aspect-square items-center justify-center"
             >
-              <span className={`text-sm ${text}`}>{d.getDate()}</span>
+              {/* Inner square is inset so the selection ring never overlaps neighbouring days. */}
+              <span
+                className={`flex aspect-square w-4/5 items-center justify-center rounded-lg transition-all duration-200 ease-in-out ${bg} ${
+                  isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#18181b]' : ring
+                }`}
+              >
+                <span className={`text-sm ${text}`}>{d.getDate()}</span>
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* Selected-day detail */}
-      {selected && (
-        <DayDetail
-          dateStr={selected}
-          entry={entryMap.get(selected) ?? null}
-          holiday={holidayMap.get(selected) ?? null}
-        />
-      )}
+      {/* Selected-day detail — animated expand/collapse */}
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          selected ? 'mt-4 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          {detailDay && (
+            <DayDetail
+              key={detailDay}
+              dateStr={detailDay}
+              entry={entryMap.get(detailDay) ?? null}
+              holiday={holidayMap.get(detailDay) ?? null}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -169,7 +188,7 @@ function DayDetail({
   const dayName = DAY_NAMES[date.getDay()];
 
   return (
-    <div className="mt-4 rounded-xl border border-[#27272a] bg-[#09090b] p-4 text-left">
+    <div className="animate-day-detail rounded-xl border border-[#27272a] bg-[#09090b] p-4 text-left">
       <p className="mb-2 text-xs font-semibold text-white">
         {dayName}, {dateLabel}
       </p>
