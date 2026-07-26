@@ -65,7 +65,8 @@ export function getDayStyle(opts: {
     bg = 'bg-[#78350f]/40';
     text = 'text-[#fbbf24]';
   } else if (isWeekend) {
-    text = 'text-[#3f3f46]';
+    bg = 'bg-[#3f3f46]/40';
+    text = 'text-[#71717a]';
   } else {
     text = 'text-[#52525b]';
   }
