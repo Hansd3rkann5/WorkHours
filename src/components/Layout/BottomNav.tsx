@@ -5,7 +5,7 @@ export function BottomNav() {
   return (
     <nav
       className="shrink-0 border-t border-[#27272a] bg-[#09090b]/95 backdrop-blur-sm xl:hidden"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) / 3)' }}
     >
       <div className="mx-auto flex max-w-2xl">
         <NavLink
