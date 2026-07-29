@@ -83,7 +83,6 @@ export function ClockButton({
         >
           {minutesToDisplay(isWorking ? worked : 0)}
         </div>
-        {isPaused && <p className="mt-1 text-xs font-medium text-[#fbbf24]">Pausiert</p>}
       </div>
 
       {/* Clock button splits into clock-out + pause when working */}

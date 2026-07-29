@@ -34,7 +34,7 @@ function AppShell() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#09090b]">
-      <Header activeEntry={!!activeEntry} />
+      <Header activeEntry={!!activeEntry} paused={!!activeEntry?.pause_started_at} />
 
       {/* ── Desktop layout (≥1280px): 3 columns, no bottom nav ── */}
       <div className="hidden xl:flex flex-1 min-h-0 divide-x divide-[#27272a]">

@@ -2,9 +2,10 @@ import { Clock } from 'lucide-react';
 
 interface HeaderProps {
   activeEntry: boolean;
+  paused: boolean;
 }
 
-export function Header({ activeEntry }: HeaderProps) {
+export function Header({ activeEntry, paused }: HeaderProps) {
   return (
     <header
       className="shrink-0 border-b border-[#27272a] bg-[#09090b]/90 backdrop-blur-sm"
@@ -17,8 +18,18 @@ export function Header({ activeEntry }: HeaderProps) {
         </div>
         {activeEntry && (
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#4ade80]" />
-            <span className="text-sm text-[#4ade80]">Eingestempelt</span>
+            <span
+              className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ease-in-out ${
+                paused ? 'bg-[#fbbf24]' : 'animate-pulse bg-[#4ade80]'
+              }`}
+            />
+            <span
+              className={`text-sm transition-colors duration-300 ease-in-out ${
+                paused ? 'text-[#fbbf24]' : 'text-[#4ade80]'
+              }`}
+            >
+              {paused ? 'Pausiert' : 'Eingestempelt'}
+            </span>
           </div>
         )}
       </div>
