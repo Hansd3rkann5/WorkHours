@@ -92,7 +92,7 @@ export function ClockButton({
           onClick={handleMain}
           disabled={busy}
           aria-label={isWorking ? 'Ausstempeln' : 'Einstempeln'}
-          className={`relative flex items-center justify-center rounded-full border-2 transition-all duration-300 ease-in-out active:scale-95 disabled:opacity-50 ${
+          className={`relative flex items-center justify-center rounded-full border-2 transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 disabled:opacity-50 ${
             isWorking
               ? 'h-20 w-20 border-[#f87171] bg-[#7f1d1d]/20 text-[#f87171] hover:bg-[#7f1d1d]/30'
               : 'h-28 w-28 border-white bg-white/5 text-white hover:bg-white/10'
@@ -111,7 +111,7 @@ export function ClockButton({
           onClick={handlePause}
           disabled={pauseBusy || busy}
           aria-label={isPaused ? 'Fortsetzen' : 'Pausieren'}
-          className={`relative flex items-center justify-center overflow-hidden rounded-full border-2 transition-all duration-300 ease-in-out active:scale-95 disabled:opacity-50 ${
+          className={`relative flex items-center justify-center overflow-hidden rounded-full border-2 transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 disabled:opacity-50 ${
             isWorking
               ? 'ml-4 h-20 w-20 opacity-100'
               : 'ml-0 h-0 w-0 border-0 opacity-0'
