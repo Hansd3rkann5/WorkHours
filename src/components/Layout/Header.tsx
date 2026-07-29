@@ -26,7 +26,7 @@ export function Header({ activeEntry, paused }: HeaderProps) {
           >
             <span
               className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ease-in-out ${
-                paused ? 'animate-pulse bg-[#fbbf24]' : 'animate-pulse bg-[#4ade80]'
+                paused ? 'animate-pulse bg-[#fbbf24]' : 'animate-active-pulse bg-[#4ade80]'
               }`}
             />
             <span

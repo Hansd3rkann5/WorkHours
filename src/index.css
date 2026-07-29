@@ -60,6 +60,22 @@ a,
   cursor: pointer;
 }
 
+/* Active indicator: large scale + full opacity fade for a strong heartbeat effect. */
+@keyframes activePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.75);
+    opacity: 0.15;
+  }
+}
+
+.animate-active-pulse {
+  animation: activePulse 1.4s ease-in-out infinite;
+}
+
 /* Calendar transitions — gentle ease-in-out reveals for content that changes. */
 @keyframes dayDetailIn {
   from {
