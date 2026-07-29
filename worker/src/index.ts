@@ -47,6 +47,8 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const origin = request.headers.get('Origin') ?? '*';
+
+    try {
     const { pathname, method } = { pathname: url.pathname, method: request.method };
 
     // CORS preflight
@@ -212,5 +214,9 @@ export default {
     }
 
     return err('Not Found', 404, origin);
+    } catch (e) {
+      // Always return CORS headers, otherwise the browser masks the real error as a CORS failure.
+      return err(e instanceof Error ? e.message : 'Server-Fehler', 500, origin);
+    }
   },
 } satisfies ExportedHandler<Env>;
