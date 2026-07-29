@@ -17,14 +17,20 @@ export function Header({ activeEntry, paused }: HeaderProps) {
           <span className="text-base font-semibold tracking-tight text-[#f4f4f5]">WorkHours</span>
         </div>
         {activeEntry && (
-          <div className="flex items-center gap-2">
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all duration-300 ease-in-out ${
+              paused
+                ? 'bg-[#78350f]/40 ring-1 ring-[#fbbf24]/50'
+                : 'bg-transparent ring-0'
+            }`}
+          >
             <span
               className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ease-in-out ${
-                paused ? 'bg-[#fbbf24]' : 'animate-pulse bg-[#4ade80]'
+                paused ? 'animate-pulse bg-[#fbbf24]' : 'animate-pulse bg-[#4ade80]'
               }`}
             />
             <span
-              className={`text-sm transition-colors duration-300 ease-in-out ${
+              className={`text-sm font-medium transition-colors duration-300 ease-in-out ${
                 paused ? 'text-[#fbbf24]' : 'text-[#4ade80]'
               }`}
             >
