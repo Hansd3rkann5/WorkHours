@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS work_entries (
   clock_out TEXT,
   clocked_minutes INTEGER,
   effective_minutes INTEGER,
+  notes TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 

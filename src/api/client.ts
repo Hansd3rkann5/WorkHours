@@ -41,7 +41,7 @@ export const api = {
 
   updateEntry: (
     id: number,
-    data: { clock_in?: string; clock_out?: string }
+    data: { clock_in?: string; clock_out?: string; notes?: string | null }
   ): Promise<WorkEntry> =>
     request(`/api/entries/${id}`, {
       method: 'PATCH',

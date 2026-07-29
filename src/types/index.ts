@@ -5,6 +5,7 @@ export interface WorkEntry {
   clock_out: string | null;
   clocked_minutes: number | null;
   effective_minutes: number | null;
+  notes: string | null;
   created_at: string;
 }
 

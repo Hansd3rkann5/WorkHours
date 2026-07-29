@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Clock, Trash2, Edit2, Check, X, ChevronDown } from 'lucide-react';
 import type { WorkEntry } from '../../types';
 import { formatTime, minutesToDisplay } from '../../utils/timeCalc';
 
@@ -16,6 +16,7 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
   const [clockOutVal, setClockOutVal] = useState(entry.clock_out ? formatTime(entry.clock_out) : '');
   const [busy, setBusy] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const handleSave = async () => {
     setBusy(true);
@@ -45,6 +46,8 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
   };
 
   const isOpen = entry.clock_out === null;
+  const hasNotes = !!entry.notes;
+  const canToggle = hasNotes && !editing;
 
   return (
     <div
@@ -55,11 +58,14 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
       } ${
         removing
           ? 'max-h-0 -translate-x-4 scale-95 border-transparent! p-0! opacity-0'
-          : 'max-h-40'
+          : 'max-h-160'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-1 items-center gap-3">
+        <div
+          onClick={canToggle ? () => setExpanded((v) => !v) : undefined}
+          className={`flex flex-1 items-center gap-3 ${canToggle ? 'cursor-pointer' : ''}`}
+        >
           <div
             className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${
               isOpen ? 'bg-[#166534]/30' : 'bg-[#27272a]'
@@ -135,6 +141,18 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
             </>
           ) : (
             <>
+              {hasNotes && (
+                <button
+                  onClick={() => setExpanded((v) => !v)}
+                  aria-label={expanded ? 'Notiz einklappen' : 'Notiz ausklappen'}
+                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#27272a] hover:text-[#a1a1aa]"
+                >
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-300 ease-in-out ${expanded ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              )}
               <button
                 onClick={() => setEditing(true)}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#27272a] hover:text-[#a1a1aa]"
@@ -152,6 +170,21 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
           )}
         </div>
       </div>
+
+      {/* Notes — animated expand/collapse */}
+      {hasNotes && (
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${
+            expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <p className="mt-3 border-t border-[#27272a] pt-3 text-sm leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
+              {entry.notes}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

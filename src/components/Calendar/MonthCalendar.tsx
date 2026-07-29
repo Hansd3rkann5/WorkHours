@@ -219,6 +219,12 @@ function DayDetail({
       ) : (
         <p className="text-[11px] text-[#52525b]">Kein Eintrag</p>
       )}
+
+      {entry?.notes && (
+        <p className="mt-2.5 border-t border-[#27272a] pt-2.5 text-[11px] leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
+          {entry.notes}
+        </p>
+      )}
     </div>
   );
 }

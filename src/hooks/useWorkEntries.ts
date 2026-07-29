@@ -45,7 +45,10 @@ export function useWorkEntries() {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   };
 
-  const updateEntry = async (id: number, data: { clock_in?: string; clock_out?: string }) => {
+  const updateEntry = async (
+    id: number,
+    data: { clock_in?: string; clock_out?: string; notes?: string | null }
+  ) => {
     const updated = await api.updateEntry(id, data);
     setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
     return updated;

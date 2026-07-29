@@ -9,6 +9,7 @@ interface WorkEntry {
   clock_out: string | null;
   clocked_minutes: number | null;
   effective_minutes: number | null;
+  notes: string | null;
   created_at: string;
 }
 
@@ -97,7 +98,11 @@ export default {
     const patchMatch = pathname.match(/^\/api\/entries\/(\d+)$/);
     if (method === 'PATCH' && patchMatch) {
       const id = Number(patchMatch[1]);
-      const body = (await request.json()) as { clock_in?: string; clock_out?: string };
+      const body = (await request.json()) as {
+        clock_in?: string;
+        clock_out?: string;
+        notes?: string | null;
+      };
 
       const existing = await env.DB.prepare('SELECT * FROM work_entries WHERE id = ?')
         .bind(id)
@@ -105,8 +110,11 @@ export default {
 
       if (!existing) return err('Nicht gefunden', 404, origin);
 
+      // Merge with existing values so a notes-only update keeps the clock times intact.
       const clockIn = new Date(body.clock_in ?? existing.clock_in);
-      const clockOut = body.clock_out ? new Date(body.clock_out) : null;
+      const clockOutStr = body.clock_out !== undefined ? body.clock_out : existing.clock_out;
+      const clockOut = clockOutStr ? new Date(clockOutStr) : null;
+      const notes = body.notes !== undefined ? body.notes : existing.notes;
 
       let clockedMinutes: number | null = null;
       let effectiveMinutes: number | null = null;
@@ -118,7 +126,7 @@ export default {
 
       await env.DB.prepare(
         `UPDATE work_entries
-         SET clock_in = ?, clock_out = ?, clocked_minutes = ?, effective_minutes = ?
+         SET clock_in = ?, clock_out = ?, clocked_minutes = ?, effective_minutes = ?, notes = ?
          WHERE id = ?`
       )
         .bind(
@@ -126,6 +134,7 @@ export default {
           clockOut ? clockOut.toISOString() : null,
           clockedMinutes,
           effectiveMinutes,
+          notes ?? null,
           id
         )
         .run();

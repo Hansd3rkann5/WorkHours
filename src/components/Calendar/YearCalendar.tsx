@@ -235,6 +235,12 @@ function DayTooltip({ data }: { data: TooltipData }) {
       ) : (
         <p className="text-[11px] text-text-muted">Kein Eintrag</p>
       )}
+
+      {entry?.notes && (
+        <p className="mt-2 border-t border-[#27272a] pt-2 text-[11px] leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
+          {entry.notes}
+        </p>
+      )}
     </div>
   );
 }

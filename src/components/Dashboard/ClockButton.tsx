@@ -2,16 +2,19 @@ import { useState, useEffect } from 'react';
 import { LogIn, LogOut, Loader2 } from 'lucide-react';
 import type { WorkEntry } from '../../types';
 import { elapsedMinutes, minutesToDisplay, calcEffectiveMinutes } from '../../utils/timeCalc';
+import { NotesDialog } from './NotesDialog';
 
 interface ClockButtonProps {
   activeEntry: WorkEntry | null;
   onClockIn: () => Promise<unknown>;
-  onClockOut: (id: number) => Promise<unknown>;
+  onClockOut: (id: number) => Promise<WorkEntry>;
+  onSaveNotes: (id: number, notes: string) => Promise<unknown>;
 }
 
-export function ClockButton({ activeEntry, onClockIn, onClockOut }: ClockButtonProps) {
+export function ClockButton({ activeEntry, onClockIn, onClockOut, onSaveNotes }: ClockButtonProps) {
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [noteEntry, setNoteEntry] = useState<WorkEntry | null>(null);
 
   useEffect(() => {
     if (!activeEntry) {
@@ -28,7 +31,8 @@ export function ClockButton({ activeEntry, onClockIn, onClockOut }: ClockButtonP
     setBusy(true);
     try {
       if (activeEntry) {
-        await onClockOut(activeEntry.id);
+        const updated = await onClockOut(activeEntry.id);
+        setNoteEntry(updated);
       } else {
         await onClockIn();
       }
@@ -86,6 +90,21 @@ export function ClockButton({ activeEntry, onClockIn, onClockOut }: ClockButtonP
       <p className="text-sm font-medium text-[#a1a1aa]">
         {isWorking ? 'Tippen zum Ausstempeln' : 'Tippen zum Einstempeln'}
       </p>
+
+      {noteEntry && (
+        <NotesDialog
+          dateLabel={new Date(noteEntry.date + 'T00:00:00').toLocaleDateString('de-DE', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          })}
+          initialNotes={noteEntry.notes ?? ''}
+          onSave={async (notes) => {
+            await onSaveNotes(noteEntry.id, notes);
+          }}
+          onClose={() => setNoteEntry(null)}
+        />
+      )}
     </div>
   );
 }
