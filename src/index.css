@@ -64,11 +64,11 @@ a,
 @keyframes activePulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 1;
+    opacity: 0.2;
   }
   50% {
-    transform: scale(1.75);
-    opacity: 0.15;
+    transform: scale(1.6);
+    opacity: 1;
   }
 }
 
