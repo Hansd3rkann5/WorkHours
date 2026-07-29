@@ -10,14 +10,18 @@ interface WorkEntry {
   clocked_minutes: number | null;
   effective_minutes: number | null;
   notes: string | null;
+  paused_minutes: number | null;
+  pause_started_at: string | null;
   created_at: string;
 }
 
 const PAUSE_THRESHOLD = 360; // 6h in minutes
 const PAUSE_DEDUCTION = 30;
 
-function calcEffective(clocked: number): number {
-  return clocked > PAUSE_THRESHOLD ? clocked - PAUSE_DEDUCTION : clocked;
+// Deduct the actual manual pauses, but never less than the legal 30 min break above 6h.
+function calcEffective(clocked: number, paused: number): number {
+  const deduction = Math.max(paused, clocked > PAUSE_THRESHOLD ? PAUSE_DEDUCTION : 0);
+  return Math.max(0, clocked - deduction);
 }
 
 function cors(origin: string) {
@@ -94,6 +98,43 @@ export default {
       return json(entry, 201, origin);
     }
 
+    // POST /api/entries/:id/pause | /resume — toggle a manual pause on an open entry
+    const pauseMatch = pathname.match(/^\/api\/entries\/(\d+)\/(pause|resume)$/);
+    if (method === 'POST' && pauseMatch) {
+      const id = Number(pauseMatch[1]);
+      const action = pauseMatch[2];
+
+      const existing = await env.DB.prepare('SELECT * FROM work_entries WHERE id = ?')
+        .bind(id)
+        .first<WorkEntry>();
+
+      if (!existing) return err('Nicht gefunden', 404, origin);
+      if (existing.clock_out) return err('Eintrag bereits abgeschlossen', 409, origin);
+
+      if (action === 'pause') {
+        if (!existing.pause_started_at) {
+          await env.DB.prepare('UPDATE work_entries SET pause_started_at = ? WHERE id = ?')
+            .bind(new Date().toISOString(), id)
+            .run();
+        }
+      } else if (existing.pause_started_at) {
+        const delta = Math.floor(
+          (Date.now() - new Date(existing.pause_started_at).getTime()) / 60000
+        );
+        const paused = (existing.paused_minutes ?? 0) + delta;
+        await env.DB.prepare(
+          'UPDATE work_entries SET paused_minutes = ?, pause_started_at = NULL WHERE id = ?'
+        )
+          .bind(paused, id)
+          .run();
+      }
+
+      const updated = await env.DB.prepare('SELECT * FROM work_entries WHERE id = ?')
+        .bind(id)
+        .first<WorkEntry>();
+      return json(updated, 200, origin);
+    }
+
     // PATCH /api/entries/:id — clock out or edit
     const patchMatch = pathname.match(/^\/api\/entries\/(\d+)$/);
     if (method === 'PATCH' && patchMatch) {
@@ -110,23 +151,34 @@ export default {
 
       if (!existing) return err('Nicht gefunden', 404, origin);
 
-      // Merge with existing values so a notes-only update keeps the clock times intact.
+      // Merge with existing values so a partial update keeps the other fields intact.
       const clockIn = new Date(body.clock_in ?? existing.clock_in);
       const clockOutStr = body.clock_out !== undefined ? body.clock_out : existing.clock_out;
       const clockOut = clockOutStr ? new Date(clockOutStr) : null;
       const notes = body.notes !== undefined ? body.notes : existing.notes;
+
+      // A pause that is still open when clocking out ends at clock_out.
+      let pausedMinutes = existing.paused_minutes ?? 0;
+      let pauseStartedAt: string | null = existing.pause_started_at;
+      if (clockOut && existing.pause_started_at) {
+        pausedMinutes += Math.floor(
+          (clockOut.getTime() - new Date(existing.pause_started_at).getTime()) / 60000
+        );
+        pauseStartedAt = null;
+      }
 
       let clockedMinutes: number | null = null;
       let effectiveMinutes: number | null = null;
 
       if (clockOut) {
         clockedMinutes = Math.floor((clockOut.getTime() - clockIn.getTime()) / 60000);
-        effectiveMinutes = calcEffective(clockedMinutes);
+        effectiveMinutes = calcEffective(clockedMinutes, pausedMinutes);
       }
 
       await env.DB.prepare(
         `UPDATE work_entries
-         SET clock_in = ?, clock_out = ?, clocked_minutes = ?, effective_minutes = ?, notes = ?
+         SET clock_in = ?, clock_out = ?, clocked_minutes = ?, effective_minutes = ?,
+             notes = ?, paused_minutes = ?, pause_started_at = ?
          WHERE id = ?`
       )
         .bind(
@@ -135,6 +187,8 @@ export default {
           clockedMinutes,
           effectiveMinutes,
           notes ?? null,
+          pausedMinutes,
+          pauseStartedAt,
           id
         )
         .run();

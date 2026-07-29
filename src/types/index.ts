@@ -6,6 +6,8 @@ export interface WorkEntry {
   clocked_minutes: number | null;
   effective_minutes: number | null;
   notes: string | null;
+  paused_minutes: number | null;
+  pause_started_at: string | null;  // ISO 8601 while a pause is active, else null
   created_at: string;
 }
 

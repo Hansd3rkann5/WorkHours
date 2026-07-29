@@ -40,6 +40,18 @@ export function useWorkEntries() {
     return updated;
   };
 
+  const pause = async (id: number) => {
+    const updated = await api.pauseEntry(id);
+    setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
+    return updated;
+  };
+
+  const resume = async (id: number) => {
+    const updated = await api.resumeEntry(id);
+    setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
+    return updated;
+  };
+
   const deleteEntry = async (id: number) => {
     await api.deleteEntry(id);
     setEntries((prev) => prev.filter((e) => e.id !== id));
@@ -65,6 +77,8 @@ export function useWorkEntries() {
     activeEntry,
     clockIn,
     clockOut,
+    pause,
+    resume,
     deleteEntry,
     updateEntry,
     balance,

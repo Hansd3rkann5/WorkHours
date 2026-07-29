@@ -36,6 +36,12 @@ export const api = {
       body: JSON.stringify({ clock_out: new Date().toISOString() }),
     }),
 
+  pauseEntry: (id: number): Promise<WorkEntry> =>
+    request(`/api/entries/${id}/pause`, { method: 'POST' }),
+
+  resumeEntry: (id: number): Promise<WorkEntry> =>
+    request(`/api/entries/${id}/resume`, { method: 'POST' }),
+
   deleteEntry: (id: number): Promise<void> =>
     request(`/api/entries/${id}`, { method: 'DELETE' }),
 

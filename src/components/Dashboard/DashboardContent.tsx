@@ -5,7 +5,7 @@ import { useWorkEntriesContext } from '../../hooks/WorkEntriesContext';
 import { Loader2, WifiOff } from 'lucide-react';
 
 export function DashboardContent() {
-  const { loading, error, todayEntry, activeEntry, clockIn, clockOut, updateEntry, balance } =
+  const { loading, error, todayEntry, activeEntry, clockIn, clockOut, pause, resume, updateEntry, balance } =
     useWorkEntriesContext();
 
   if (loading) {
@@ -32,6 +32,8 @@ export function DashboardContent() {
         activeEntry={activeEntry}
         onClockIn={clockIn}
         onClockOut={clockOut}
+        onPause={pause}
+        onResume={resume}
         onSaveNotes={(id, notes) => updateEntry(id, { notes })}
       />
       <TodayStats todayEntry={todayEntry} activeEntry={activeEntry} />
