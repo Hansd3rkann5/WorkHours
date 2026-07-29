@@ -18,11 +18,11 @@ export function Header({ activeEntry, paused }: HeaderProps) {
         </div>
         {activeEntry && (
           <div
-            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all duration-300 ease-in-out ${
-              paused
-                ? 'bg-[#78350f]/40 ring-1 ring-[#fbbf24]/50'
-                : 'bg-transparent ring-0'
-            }`}
+            // className={`flex items-center gap-1.5 rounded-full py-1 transition-all duration-300 ease-in-out bg-transparent ring-0 ${
+            //   paused
+            //     ? 'bg-[#78350f]/40 ring-1 ring-[#fbbf24]/50'
+            //     : 'bg-transparent ring-0'
+            // }`}
           >
             <span
               className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ease-in-out ${
