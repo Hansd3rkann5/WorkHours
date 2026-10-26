@@ -74,9 +74,40 @@ export default {
 
     // POST /api/entries — clock in
     if (method === 'POST' && pathname === '/api/entries') {
-      const body = (await request.json()) as { clock_in: string };
+      const body = (await request.json()) as {
+        clock_in: string;
+        clock_out?: string;
+        date?: string;
+        notes?: string | null;
+      };
       const clockIn = new Date(body.clock_in);
-      const date = clockIn.toISOString().slice(0, 10);
+      const date = body.date ?? clockIn.toISOString().slice(0, 10);
+
+      // Manual backfill: a complete entry (clock_in + clock_out) for a given day.
+      if (body.clock_out) {
+        const clockOut = new Date(body.clock_out);
+        if (isNaN(clockIn.getTime()) || isNaN(clockOut.getTime()) || clockOut <= clockIn) {
+          return err('Ungültige Zeiten', 400, origin);
+        }
+        const clocked = Math.floor((clockOut.getTime() - clockIn.getTime()) / 60000);
+        const { meta } = await env.DB.prepare(
+          `INSERT INTO work_entries (date, clock_in, clock_out, clocked_minutes, effective_minutes, notes)
+           VALUES (?, ?, ?, ?, ?, ?)`
+        )
+          .bind(
+            date,
+            clockIn.toISOString(),
+            clockOut.toISOString(),
+            clocked,
+            calcEffective(clocked, 0),
+            body.notes ?? null
+          )
+          .run();
+        const created = await env.DB.prepare('SELECT * FROM work_entries WHERE id = ?')
+          .bind(meta.last_row_id)
+          .first<WorkEntry>();
+        return json(created, 201, origin);
+      }
 
       // Prevent duplicate open entry for same day
       const existing = await env.DB.prepare(

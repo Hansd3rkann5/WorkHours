@@ -34,6 +34,17 @@ export function useWorkEntries() {
     return entry;
   };
 
+  const addManualEntry = async (data: {
+    date: string;
+    clock_in: string;
+    clock_out: string;
+    notes?: string | null;
+  }) => {
+    const entry = await api.createManualEntry(data);
+    setEntries((prev) => [entry, ...prev]);
+    return entry;
+  };
+
   const clockOut = async (id: number) => {
     const updated = await api.clockOut(id);
     setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
@@ -77,6 +88,7 @@ export function useWorkEntries() {
     activeEntry,
     clockIn,
     clockOut,
+    addManualEntry,
     pause,
     resume,
     deleteEntry,

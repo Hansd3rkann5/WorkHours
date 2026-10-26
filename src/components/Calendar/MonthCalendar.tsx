@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useWorkEntriesContext } from '../../hooks/WorkEntriesContext';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
 import {
@@ -157,6 +158,7 @@ export function MonthCalendar({ entries }: MonthCalendarProps) {
               dateStr={detailDay}
               entry={entryMap.get(detailDay) ?? null}
               holiday={holidayMap.get(detailDay) ?? null}
+              canAdd={detailDay <= today}
             />
           )}
         </div>
@@ -178,10 +180,12 @@ function DayDetail({
   dateStr,
   entry,
   holiday,
+  canAdd,
 }: {
   dateStr: string;
   entry: WorkEntry | null;
   holiday: string | null;
+  canAdd: boolean;
 }) {
   const date = new Date(dateStr + 'T00:00:00');
   const dateLabel = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -217,7 +221,10 @@ function DayDetail({
           <p className="text-[11px] text-[#22c55e]">Aktiv seit {fmtTime(entry.clock_in)}</p>
         )
       ) : (
-        <p className="text-[11px] text-[#52525b]">Kein Eintrag</p>
+        <>
+          <p className="text-[11px] text-[#52525b]">Kein Eintrag</p>
+          {canAdd && <ManualEntryForm dateStr={dateStr} />}
+        </>
       )}
 
       {entry?.notes && (
@@ -225,6 +232,93 @@ function DayDetail({
           {entry.notes}
         </p>
       )}
+    </div>
+  );
+}
+
+function ManualEntryForm({ dateStr }: { dateStr: string }) {
+  const { addManualEntry } = useWorkEntriesContext();
+  const [open, setOpen] = useState(false);
+  const [from, setFrom] = useState('09:00');
+  const [to, setTo] = useState('13:00');
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const save = async () => {
+    // Build local timestamps and send them as UTC ISO strings.
+    const clockIn = new Date(`${dateStr}T${from}:00`);
+    const clockOut = new Date(`${dateStr}T${to}:00`);
+    if (!from || !to || clockOut <= clockIn) {
+      setError('Ende muss nach dem Beginn liegen');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await addManualEntry({
+        date: dateStr,
+        clock_in: clockIn.toISOString(),
+        clock_out: clockOut.toISOString(),
+        notes: notes.trim() || null,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Fehler beim Speichern');
+      setBusy(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="mt-3 flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#3f3f46] px-3 py-1.5 text-[11px] font-medium text-[#d4d4d8] transition-colors hover:bg-[#27272a]"
+      >
+        <Plus size={12} />
+        Stunden hinzufügen
+      </button>
+    );
+  }
+
+  const inputCls =
+    'rounded-lg border border-[#3f3f46] bg-[#27272a] px-2 py-1 text-sm text-white focus:border-white focus:outline-none';
+
+  return (
+    <div className="mt-3 space-y-2.5 border-t border-[#27272a] pt-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-1.5 text-[11px] text-[#71717a]">
+          Ein
+          <input type="time" value={from} onChange={(e) => setFrom(e.target.value)} className={inputCls} />
+        </label>
+        <label className="flex items-center gap-1.5 text-[11px] text-[#71717a]">
+          Aus
+          <input type="time" value={to} onChange={(e) => setTo(e.target.value)} className={inputCls} />
+        </label>
+      </div>
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Notiz (optional)"
+        rows={2}
+        className={`${inputCls} w-full resize-none text-[11px]`}
+      />
+      {error && <p className="text-[11px] text-[#f87171]">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          onClick={save}
+          disabled={busy}
+          className="cursor-pointer rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-black disabled:opacity-50"
+        >
+          Speichern
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          disabled={busy}
+          className="cursor-pointer rounded-lg px-3 py-1.5 text-[11px] text-[#a1a1aa] hover:bg-[#27272a]"
+        >
+          Abbrechen
+        </button>
+      </div>
     </div>
   );
 }

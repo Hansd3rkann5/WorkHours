@@ -30,6 +30,14 @@ export const api = {
       body: JSON.stringify({ clock_in: new Date().toISOString() }),
     }),
 
+  createManualEntry: (data: {
+    date: string;
+    clock_in: string;
+    clock_out: string;
+    notes?: string | null;
+  }): Promise<WorkEntry> =>
+    request('/api/entries', { method: 'POST', body: JSON.stringify(data) }),
+
   clockOut: (id: number): Promise<WorkEntry> =>
     request(`/api/entries/${id}`, {
       method: 'PATCH',
