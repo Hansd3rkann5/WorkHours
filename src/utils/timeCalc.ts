@@ -64,7 +64,8 @@ export function currentWeekKey(): string {
  * Current week is excluded from balance and shown separately.
  *
  * Weeks with a Monday before EMPLOYMENT_START are pure positive (no 12h/week target).
- * Weeks from EMPLOYMENT_START onwards are compared against the 12h/week target.
+ * Every completed week from EMPLOYMENT_START onwards is compared against the 12h/week
+ * target, even if it has no entries.
  */
 export function calcBalance(entries: WorkEntry[]): {
   balanceMinutes: number;
@@ -91,11 +92,20 @@ export function calcBalance(entries: WorkEntry[]): {
   for (const [wk, { mins, monday }] of Object.entries(weekMap)) {
     if (wk === thisWeek) continue;
     weeksWithEntries++;
-    if (monday >= EMPLOYMENT_START) {
-      balanceMinutes += mins - TARGET_PER_WEEK;
-    } else {
+    if (monday < EMPLOYMENT_START) {
       balanceMinutes += mins; // before employment start: pure positive
     }
+  }
+
+  // From EMPLOYMENT_START onwards the 12h target is mandatory, so every completed
+  // week counts against it, including weeks without any entry.
+  const currentMonday = getWeekMonday(todayStr());
+  const monday = getWeekMonday(localDateStr(EMPLOYMENT_START));
+  if (monday < EMPLOYMENT_START) monday.setDate(monday.getDate() + 7);
+  while (monday < currentMonday) {
+    const wk = getISOWeekKey(localDateStr(monday));
+    balanceMinutes += (weekMap[wk]?.mins ?? 0) - TARGET_PER_WEEK;
+    monday.setDate(monday.getDate() + 7);
   }
 
   const thisWeekMinutes = weekMap[thisWeek]?.mins ?? 0;
@@ -116,6 +126,10 @@ export function formatDate(dateStr: string): string {
 export function formatDateShort(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export function todayStr(): string {
