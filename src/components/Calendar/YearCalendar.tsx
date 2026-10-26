@@ -1,7 +1,8 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
+import { DayDetail } from './MonthCalendar';
 import {
   MONTH_NAMES,
   DAY_NAMES,
