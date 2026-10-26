@@ -176,7 +176,7 @@ function LegendDot({ bg, label }: { bg: string; label: string }) {
   );
 }
 
-function DayDetail({
+export function DayDetail({
   dateStr,
   entry,
   holiday,

@@ -29,6 +29,7 @@ interface YearCalendarProps {
 export function YearCalendar({ entries }: YearCalendarProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const today = localDateStr(new Date());
+  const [selected, setSelected] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -69,6 +70,12 @@ export function YearCalendar({ entries }: YearCalendarProps) {
     },
     [entryMap, holidayMap]
   );
+
+  const handleDayClick = useCallback((dateStr: string) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setTooltip(null);
+    setSelected(dateStr);
+  }, []);
 
   const handleDayLeave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -114,11 +121,36 @@ export function YearCalendar({ entries }: YearCalendarProps) {
             today={today}
             onDayEnter={handleDayEnter}
             onDayLeave={handleDayLeave}
+            onDayClick={handleDayClick}
           />
         ))}
       </div>
 
       {tooltip && <DayTooltip data={tooltip} />}
+
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setSelected(null)}
+        >
+          <div className="relative w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <DayDetail
+              key={selected}
+              dateStr={selected}
+              entry={entryMap.get(selected) ?? null}
+              holiday={holidayMap.get(selected) ?? null}
+              canAdd={selected <= today}
+            />
+            <button
+              onClick={() => setSelected(null)}
+              aria-label="Schließen"
+              className="absolute top-2 right-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-[#71717a] hover:bg-[#27272a] hover:text-white"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -141,9 +173,10 @@ interface MonthGridProps {
   today: string;
   onDayEnter: (e: React.MouseEvent<HTMLDivElement>, dateStr: string, date: Date) => void;
   onDayLeave: () => void;
+  onDayClick: (dateStr: string) => void;
 }
 
-function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDayEnter, onDayLeave }: MonthGridProps) {
+function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDayEnter, onDayLeave, onDayClick }: MonthGridProps) {
   const days = getDaysInMonth(year, month);
   const blanks = leadingBlanks(year, month);
 
@@ -176,7 +209,8 @@ function MonthGrid({ year, month, workDays, activeDate, holidayMap, today, onDay
           return (
             <div
               key={s}
-              className="aspect-square flex items-center justify-center"
+              className="aspect-square flex cursor-pointer items-center justify-center"
+              onClick={() => onDayClick(s)}
               onMouseEnter={(e) => onDayEnter(e, s, d)}
               onMouseLeave={onDayLeave}
             >
