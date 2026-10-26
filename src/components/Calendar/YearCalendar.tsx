@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { visibleNotes } from '../../utils/timeCalc';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
 import { DayDetail } from './MonthCalendar';
@@ -271,9 +272,9 @@ function DayTooltip({ data }: { data: TooltipData }) {
         <p className="text-[11px] text-text-muted">Kein Eintrag</p>
       )}
 
-      {entry?.notes && (
+      {visibleNotes(entry) && (
         <p className="mt-2 border-t border-[#27272a] pt-2 text-[11px] leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
-          {entry.notes}
+          {visibleNotes(entry)}
         </p>
       )}
     </div>

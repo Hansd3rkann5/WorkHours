@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Clock, Trash2, Edit2, Check, X, ChevronDown } from 'lucide-react';
 import type { WorkEntry } from '../../types';
-import { formatTime, minutesToDisplay } from '../../utils/timeCalc';
+import { formatTime, minutesToDisplay, visibleNotes } from '../../utils/timeCalc';
 
 interface WorkDayCardProps {
   entry: WorkEntry;
@@ -46,7 +46,8 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
   };
 
   const isOpen = entry.clock_out === null;
-  const hasNotes = !!entry.notes;
+  const notes = visibleNotes(entry);
+  const hasNotes = !!notes;
   const canToggle = hasNotes && !editing;
 
   return (
@@ -180,7 +181,7 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
         >
           <div className="overflow-hidden">
             <p className="mt-3 border-t border-[#27272a] pt-3 text-sm leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
-              {entry.notes}
+              {notes}
             </p>
           </div>
         </div>

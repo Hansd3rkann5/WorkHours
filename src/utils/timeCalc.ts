@@ -136,3 +136,12 @@ export function todayStr(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+const BACKFILL_NOTE_PREFIX = 'Nachgetragen';
+
+/** Notes shown in the UI. The automatic backfill marker stays in the database but is not displayed. */
+export function visibleNotes(entry: WorkEntry | null | undefined): string | null {
+  const n = entry?.notes;
+  if (!n || n.startsWith(BACKFILL_NOTE_PREFIX)) return null;
+  return n;
+}

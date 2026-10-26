@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useWorkEntriesContext } from '../../hooks/WorkEntriesContext';
+import { visibleNotes } from '../../utils/timeCalc';
 import type { WorkEntry } from '../../types';
 import { getHolidayMap } from '../../utils/holidays';
 import {
@@ -227,9 +228,9 @@ export function DayDetail({
         </>
       )}
 
-      {entry?.notes && (
+      {visibleNotes(entry) && (
         <p className="mt-2.5 border-t border-[#27272a] pt-2.5 text-[11px] leading-relaxed whitespace-pre-wrap text-[#a1a1aa]">
-          {entry.notes}
+          {visibleNotes(entry)}
         </p>
       )}
     </div>
