@@ -4,7 +4,7 @@ import { useWorkEntriesContext } from '../../hooks/WorkEntriesContext';
 import { WorkDayCard } from './WorkDayCard';
 import { ExportMenu } from './ExportMenu';
 import { getHolidayMap } from '../../utils/holidays';
-import { getISOWeekKey, minutesToDisplay } from '../../utils/timeCalc';
+import { getISOWeekKey, isBeforeEmploymentStart, minutesToDisplay } from '../../utils/timeCalc';
 import type { WorkEntry } from '../../types';
 
 function groupByMonth(entries: WorkEntry[]): Record<string, WorkEntry[]> {
@@ -118,9 +118,16 @@ export function HistoryList() {
                             <span className="text-xs text-[#3f3f46]">
                               KW {wk.split('-W')[1]}
                             </span>
-                            <span className={`text-xs font-medium ${weekTotalColor(weekTotal)}`}>
-                              {minutesToDisplay(weekTotal)} / 12:00
-                            </span>
+                            {isBeforeEmploymentStart(date) ? (
+                              // Before the official start there is no weekly target: pure bonus hours.
+                              <span className="text-xs font-medium text-[#4ade80]">
+                                {minutesToDisplay(weekTotal)} / 0
+                              </span>
+                            ) : (
+                              <span className={`text-xs font-medium ${weekTotalColor(weekTotal)}`}>
+                                {minutesToDisplay(weekTotal)} / 12:00
+                              </span>
+                            )}
                           </div>
                         )}
                         <p className="mb-1 text-xs text-[#52525b]">{dayLabel(date)}</p>

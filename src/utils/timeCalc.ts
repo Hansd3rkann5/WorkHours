@@ -7,6 +7,11 @@ const PAUSE_MINUTES = 30;
 // Employment officially started July 2026, so May/June entries are pure bonus.
 const EMPLOYMENT_START = new Date('2026-07-01T00:00:00');
 
+/** True if the ISO week containing dateStr started before the official employment start (no weekly target). */
+export function isBeforeEmploymentStart(dateStr: string): boolean {
+  return getWeekMonday(dateStr) < EMPLOYMENT_START;
+}
+
 export function calcEffectiveMinutes(clockedMinutes: number): number {
   if (clockedMinutes > PAUSE_THRESHOLD_MINUTES) {
     return clockedMinutes - PAUSE_MINUTES;
