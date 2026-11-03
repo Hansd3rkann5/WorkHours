@@ -18,11 +18,20 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
   const [removing, setRemoving] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
+  const startEditing = () => {
+    // Re-sync with the current entry so the inputs match what the overview shows.
+    setClockInVal(formatTime(entry.clock_in));
+    setClockOutVal(entry.clock_out ? formatTime(entry.clock_out) : '');
+    setEditing(true);
+  };
+
   const handleSave = async () => {
     setBusy(true);
     try {
       const base = entry.date;
-      const toISO = (timeStr: string) => `${base}T${timeStr}:00`;
+      // Inputs are local times; send them as UTC ISO strings (the worker parses
+      // timezone-less strings as UTC, which would shift the displayed time).
+      const toISO = (timeStr: string) => new Date(`${base}T${timeStr}:00`).toISOString();
       const data: { clock_in?: string; clock_out?: string } = {};
       if (clockInVal) data.clock_in = toISO(clockInVal);
       if (clockOutVal) data.clock_out = toISO(clockOutVal);
@@ -155,7 +164,7 @@ export function WorkDayCard({ entry, holidayName, onDelete, onUpdate }: WorkDayC
                 </button>
               )}
               <button
-                onClick={() => setEditing(true)}
+                onClick={startEditing}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[#52525b] transition-colors hover:bg-[#27272a] hover:text-[#a1a1aa]"
               >
                 <Edit2 size={14} />
